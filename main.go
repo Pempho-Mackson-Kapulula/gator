@@ -3,35 +3,53 @@ package main
 import (
 	"log"
 	"os"
+	"database/sql"
 
 	"github.com/Pempho-Mackson-Kapulula/gator/internal/config"
+	"github.com/Pempho-Mackson-Kapulula/gator/internal/database"
+	 _ "github.com/lib/pq"
 )
 
 // state struct
 type state struct {
 	cfg *config.Config
+	queries *database.Queries
 }
 
 func main() {
-
 	//read config file
 	cfg, err := config.Read()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	//create db connection
+	db, err := sql.Open("postgres", cfg.DbURL)
+	if err != nil{
+		log.Fatal(err)
+	}	
+
+	//create bdQueries for stateInstance
+	dbQueries := database.New(db)
+
+	// create state and command instances
 	stateinstance := &state{
 		cfg: &cfg,
+		queries: dbQueries,
 	}
 
 	commandsInstance := commands{
 		registeredCommands: make(map[string]func(*state, command) error),
 	}
 
+	//register commands
 	commandsInstance.register("login", handlerLogin)
+	commandsInstance.register("register", handlerRegister)
+	commandsInstance.register("reset", handlerReset)
+	
 
 	if len(os.Args) < 2 {
-		log.Fatal("")
+		log.Fatal("invalid inputs")
 	}
 
 	cmdName := os.Args[1]
