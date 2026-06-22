@@ -33,20 +33,21 @@ func main() {
 	dbQueries := database.New(db)
 
 	// create state and command instances
-	stateinstance := &state{
+	programState := &state{
 		cfg:     &cfg,
 		queries: dbQueries,
 	}
 
-	commandsInstance := commands{
+	cmds := commands{
 		registeredCommands: make(map[string]func(*state, command) error),
 	}
 
 	//register commands
-	commandsInstance.register("login", handlerLogin)
-	commandsInstance.register("register", handlerRegister)
-	commandsInstance.register("reset", handlerReset)
-	commandsInstance.register("users", handlerListusers)
+	cmds.register("login", handlerLogin)
+	cmds.register("register", handlerRegister)
+	cmds.register("reset", handlerReset)
+	cmds.register("users", handlerListUsers)
+	cmds.register("agg", handlerAgg)
 
 	if len(os.Args) < 2 {
 		log.Fatal("invalid inputs")
@@ -60,7 +61,7 @@ func main() {
 		args: args,
 	}
 
-	err = commandsInstance.run(stateinstance, command)
+	err = cmds.run(programState, command)
 	if err != nil {
 		log.Fatal(err)
 	}
