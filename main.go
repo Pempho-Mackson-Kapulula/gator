@@ -1,18 +1,18 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"os"
-	"database/sql"
 
 	"github.com/Pempho-Mackson-Kapulula/gator/internal/config"
 	"github.com/Pempho-Mackson-Kapulula/gator/internal/database"
-	 _ "github.com/lib/pq"
+	_ "github.com/lib/pq"
 )
 
 // state struct
 type state struct {
-	cfg *config.Config
+	cfg     *config.Config
 	queries *database.Queries
 }
 
@@ -25,16 +25,16 @@ func main() {
 
 	//create db connection
 	db, err := sql.Open("postgres", cfg.DbURL)
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
-	}	
+	}
 
 	//create bdQueries for stateInstance
 	dbQueries := database.New(db)
 
 	// create state and command instances
 	stateinstance := &state{
-		cfg: &cfg,
+		cfg:     &cfg,
 		queries: dbQueries,
 	}
 
@@ -46,7 +46,7 @@ func main() {
 	commandsInstance.register("login", handlerLogin)
 	commandsInstance.register("register", handlerRegister)
 	commandsInstance.register("reset", handlerReset)
-	
+	commandsInstance.register("users", handlerListusers)
 
 	if len(os.Args) < 2 {
 		log.Fatal("invalid inputs")
