@@ -12,13 +12,13 @@ import (
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.args) == 0 {
-		return fmt.Errorf("Username can not be empty")
+		return fmt.Errorf("username can not be empty")
 	}
 
 	//handle duplicate users
 	_, err := s.queries.GetUser(context.Background(), cmd.args[0])
 	if err != nil {
-		fmt.Println("User does not exist")
+		fmt.Println("user does not exist")
 		os.Exit(1)
 	}
 

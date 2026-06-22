@@ -17,9 +17,9 @@ func (c *commands) register(name string, f func(*state, command) error) {
 
 func (c *commands) run(s *state, cmd command) error {
 	handler, ok := c.registeredCommands[cmd.name]
-	if !ok{
+	if !ok {
 		return fmt.Errorf("Command is not found")
 	}
 
-	return handler(s,cmd)
+	return handler(s, cmd)
 }
