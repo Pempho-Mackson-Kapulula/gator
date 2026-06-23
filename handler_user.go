@@ -15,15 +15,8 @@ func handlerLogin(s *state, cmd command) error {
 		return fmt.Errorf("username can not be empty")
 	}
 
-	//handle duplicate users
-	_, err := s.queries.GetUser(context.Background(), cmd.args[0])
-	if err != nil {
-		fmt.Println("user does not exist")
-		os.Exit(1)
-	}
-
 	// set user
-	err = s.cfg.SetUser(cmd.args[0])
+	err := s.cfg.SetUser(cmd.args[0])
 	if err != nil {
 		return fmt.Errorf("could not set user: %v", err)
 	}
@@ -38,7 +31,7 @@ func handlerRegister(s *state, cmd command) error {
 	}
 
 	//fill in user details
-	user, err := s.queries.CreateUser(context.Background(), database.CreateUserParams{
+	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -57,6 +50,27 @@ func handlerRegister(s *state, cmd command) error {
 	}
 	// print success message
 	fmt.Println("User registered successfully!")
+
+	return nil
+}
+
+
+func handlerListUsers(s *state, cmd command) error {
+	currentUser := s.cfg.CurrentUserName
+
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil {
+    	return fmt.Errorf("couldn't list users: %w", err)
+	}
+
+
+	for _, user := range users {
+		if user.Name == currentUser {
+			fmt.Printf("* %w (current)\n", user.Name)
+			continue
+		}
+		fmt.Printf("* %w\n", user.Name)
+	}
 
 	return nil
 }

@@ -13,7 +13,7 @@ import (
 // state struct
 type state struct {
 	cfg     *config.Config
-	queries *database.Queries
+	db *database.Queries
 }
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 	// create state and command instances
 	programState := &state{
 		cfg:     &cfg,
-		queries: dbQueries,
+		db: dbQueries,
 	}
 
 	cmds := commands{
@@ -43,15 +43,15 @@ func main() {
 	}
 
 	//register commands
-	cmds.register("login", handlerLogin)
+	cmds.register("login",handlerLogin)
 	cmds.register("register", handlerRegister)
 	cmds.register("reset", handlerReset)
 	cmds.register("users", handlerListUsers)
 	cmds.register("agg", handlerAgg)
-	cmds.register("addfeed", handlerAddFeed)
+	cmds.register("addfeed",  middlewareLoggedIn(handlerAddFeed))
 	cmds.register("feeds", handlerListFeeds)
-	cmds.register("follow", handlerFeedFollows)
-	cmds.register("following", handlerListFeedFollows)
+	cmds.register("follow", middlewareLoggedIn(handlerFeedFollows))
+	cmds.register("following", middlewareLoggedIn(handlerListFeedFollows))
 
 	if len(os.Args) < 2 {
 		log.Fatal("invalid inputs")
