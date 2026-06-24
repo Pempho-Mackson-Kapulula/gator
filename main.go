@@ -53,6 +53,7 @@ func main() {
 	cmds.register("follow", middlewareLoggedIn(handlerFeedFollows))
 	cmds.register("following", middlewareLoggedIn(handlerListFeedFollows))
 	cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
+	cmds.register("browse", middlewareLoggedIn(handlerBrowse))
 
 	if len(os.Args) < 2 {
 		log.Fatal("invalid inputs")
